@@ -9,6 +9,7 @@ import com.example.urlshortener.repository.ClickEventRepository;
 import com.example.urlshortener.repository.UrlMappingRepository;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.util.StringBuilders;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
-import com.example.urlshortener.service.ClickTrackingService;
 
 @Service
 @AllArgsConstructor
@@ -25,9 +25,8 @@ public class UrlMappingService {
 
     private UrlMappingRepository urlMappingRepository;
     private ClickEventRepository clickEventRepository;
-    private ClickTrackingService clickTrackingService;   // add this
 
-
+    private ClickTrackingService clickTrackingService;
     public UrlMappingDTO createShortUrl(String originalUrl, User user) {
         String shortUrl = generateShortUrl();
         UrlMapping urlMapping = new UrlMapping();
@@ -97,10 +96,10 @@ public class UrlMappingService {
     public UrlMapping getOriginalUrl(String shortUrl) {
         UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
 
-        if (urlMapping != null) {
-            clickTrackingService.trackClickAsync(urlMapping.getId());
+        if(urlMapping != null) {
+           clickTrackingService.trackClickAsync(urlMapping.getId());
         }
-
         return urlMapping;
     }
+
 }
