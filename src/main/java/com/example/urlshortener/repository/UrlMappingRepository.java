@@ -20,6 +20,6 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping,Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE UrlMAPPING u SET u.click_count=u.click_count+1 WHERE u.id = :id")
+    @Query("UPDATE UrlMapping u SET u.click_count = u.click_count + 1 WHERE u.id = :id")
     void incrementClickAsync(@Param("id") Long id);
 }
