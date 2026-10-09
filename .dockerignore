@@ -1,8 +1,11 @@
-target/
-.git/
+target
+.git
 .gitignore
 .dockerignore
-.idea/
+.idea
 *.md
 *.log
+.env
+.env.*
+!.env.example
 Dockerfile

@@ -1,23 +1,13 @@
-# ---- Build stage ----
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:3.9.9-eclipse-temurin-24 AS build
 WORKDIR /app
-
-# Cache dependencies first
-COPY pom.xml .
-RUN mvn -B dependency:go-offline
-
-# Copy source and build
+COPY pom.xml ./
 COPY src ./src
-RUN mvn -B clean package -DskipTests
+RUN mvn -B -DskipTests package
 
-# ---- Runtime stage ----
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:24-jre AS runtime
 WORKDIR /app
-
-# Render sets $PORT at runtime; Spring Boot needs to bind to it
 ENV JAVA_OPTS=""
-COPY --from=build /app/target/*.jar app.jar
-
+COPY --from=build --chown=10001:10001 /app/target/url-shortener-1.0-SNAPSHOT.jar /app/app.jar
+USER 10001:10001
 EXPOSE 8080
-
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -XX:MaxRAMPercentage=75 -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
